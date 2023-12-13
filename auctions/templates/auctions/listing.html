@@ -1,0 +1,88 @@
+{% extends "auctions/layout.html" %}
+
+
+{% block body %}
+    <h2> Listings</h2>
+    {% if messages %}
+    <div class="messages">
+    {% for message in messages %}
+        <div class="alert {% if message.tags %}alert-{{ message.tags }}"{% endif %}>
+            {{ message }}
+        </div>
+    {% endfor %}
+    </div>
+{% endif %}
+    <hr>
+    <div class="row">
+        <div class="card" style="width: 18rem; margin-left: 20px; margin-right: 20px;">
+            {% if not listing.image_url %}
+                <img class="card-img-top" style="height:300px;" src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/65/No-Image-Placeholder.svg/1665px-No-Image-Placeholder.svg.png" alt="Card image cap">
+            {% else %}
+                <img class="card-img-top" src="{{listing.image_url}}" alt="Card image cap">
+            {% endif %}
+            <div class="card-body">
+            <h5 class="card-title">{{listing.title}}</h5>
+            <h6 class="card-text">{{listing.description}}</h6>
+            <h6 class="card-text">Current Price is: {{listing.current_price}}$</h6>
+            <h6 class="card-text" style="color:#B2B3B5;">{{listing.date}}</h6>
+            {% if listing.is_active %}
+
+                <form action="{% url 'listing' listing.id %}" method="post">
+                {% csrf_token %}
+                <input class="form-control"  type="number" min="0" name="user_bid" placeholder="Place Your Bid"  required>
+                <input style="margin-top: 10px; border-color: #901d1d; background-color: #901d1d;" class="btn btn-primary" type="submit" value="Send Bid">
+                </form>
+                    {% if user.is_authenticated %}
+                        {% if is_watchlist %}
+                            <form action="{% url 'remove_watchlist' %}" method="post">
+                                {% csrf_token %}
+                                <input style="margin-top: 10px; border-color: #901d1d; background-color: #901d1d;" value="Remove From Watchlist"  id="watchlist"  class="btn btn-primary" type="submit">
+                                <input type="hidden" name="listing_id" value="{{ listing.id }}">
+                            </form>
+                        {% else %}
+                            <form action="{% url 'add_watchlist' %}" method="post">
+                                {% csrf_token %}
+                                <input style="margin-top: 10px; align-self: right;border-color: #901d1d; background-color: #901d1d;" value="Add To Watchlist" placeholder="Add To Watchlist" id="watchlist"  class="btn btn-primary" type="submit">
+                                <input type="hidden" name="listing_id" value="{{ listing.id }}">
+                            </form>
+                        {% endif %}
+                        {% if request.user == listing.user %}
+                            <form action="{% url 'close_bid' %}" method="post">
+                                {% csrf_token %}
+                                <input style="margin-top: 10px; border-color: #901d1d; background-color: #901d1d;" value="Close Bidding"   class="btn btn-primary" type="submit">
+                                <input type="hidden" name="listing_id" value="{{ listing.id }}">
+                            </form>
+                        {% endif %}
+                        <form action="{% url 'add_comment' %}" method="post">
+                            {% csrf_token %}
+                            <input style="margin-top: 10px; " class="form-control" name="comment" placeholder="Add a comment" type="text">
+                            <input type="hidden" name="listing_id" value="{{ listing.id }}">
+                            <input style="margin-top: 10px; border-color: #901d1d; background-color: #901d1d;" placeholder="Add a comment" class="btn btn-primary" type="submit">
+                    {% endif %}
+
+            {% else %}
+                <h6 class="card-text">This Listing is closed</h6>
+                {% if request.user == listing.winner %}
+                <h6 class="card-text" style="color:#901d1d;">You have won this bidding!</h6>
+                {% endif %}
+            {% endif %}
+            </div>
+        </div>
+        <div>
+            {% if comments %}
+            <ul>
+            {% for comment in comments %}
+                <li>
+                    {{ comment.content}} created on {{comment.date}}
+                </li>
+            {% endfor %}
+            </ul>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+    
+
+    

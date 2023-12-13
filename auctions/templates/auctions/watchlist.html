@@ -1,0 +1,29 @@
+{% extends "auctions/layout.html" %}
+
+{% block body %}
+    <h2>Watchlist</h2>
+    <hr>
+    <div class="row">
+        {% if not listings %}
+        <h2 style="color:#901d1d; margin-left: 20px;"> You dont have anything in your watchlist!</h2>
+        {% endif %}
+        {% for listing in listings %}
+        <div class="card" style="width: 18rem; margin-left: 20px; margin-right: 20px;">
+            {% if not listing.image_url %}
+                <img class="card-img-top" style="height:300px;" src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/65/No-Image-Placeholder.svg/1665px-No-Image-Placeholder.svg.png" alt="Card image cap">
+            {% else %}
+                <img class="card-img-top" src="{{listing.image_url}}" alt="Card image cap">
+            {% endif %}
+            <div class="card-body">
+                <a class="card-text"  style="color:#901d1d" href="{% url 'listing' listing.id %}" >{{ listing.title }}</a>
+                <h6 class="card-text">{{listing.description}}</h6>
+
+            </div>
+      </div>
+      {% endfor %}
+    </div>
+{% endblock %}
+
+    
+
+    
